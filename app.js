@@ -24,10 +24,10 @@ io.on('connection', (socket) => {
 
 
 // Create link to Angular build directory
-app.use(express.static(__dirname + "/dist/"));
+//app.use(express.static(__dirname + "/dist/"));
 
 // Initialize our websocket server on port 5000
-app.listen(5000, () => {
+http.listen(5000, () => {
     console.log('started on port 5000');
 });
 
