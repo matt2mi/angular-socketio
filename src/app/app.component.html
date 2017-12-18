@@ -1,0 +1,9 @@
+<input type="text" [(ngModel)]="pseudo" placeholder="choose pseudo">
+<button (click)="signUp()">log in</button>
+<hr>
+<input type="text" [(ngModel)]="currentAnswer" placeholder="type message">
+<button (click)="sendMessage()">Send</button>
+
+<div style="border: 1px solid black;" *ngFor="let message of messages.reverse();">
+    {{message.value.pseudo}} : {{message.value.message}}
+</div>
