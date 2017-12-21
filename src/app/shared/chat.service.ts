@@ -13,9 +13,9 @@ export class ChatService {
               private userService: UserService) {
   }
 
-  connection(pseudo: string) {
+  connection(pseudo: string, url: string) {
     return this.messages = <Subject<any>>this.wsService
-      .connect(pseudo)
+      .connect(pseudo, url)
       .map((response: any): any => {
         this.userService.pseudo = pseudo;
         return response;

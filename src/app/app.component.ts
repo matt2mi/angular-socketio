@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   messages: Message[] = [];
   currentAnswer: string;
   pseudo: string;
+  url: string;
   nbMaxUsers: number;
   nbUsers: number;
   userConnected = false;
@@ -37,7 +38,7 @@ export class AppComponent implements OnInit {
   }
 
   signUp() {
-    this.chatService.connection(this.pseudo);
+    this.chatService.connection(this.pseudo, this.url);
     this.userConnected = true;
     this.chatService.messages.subscribe(msg => {
         console.log(msg);
@@ -69,12 +70,12 @@ export class AppComponent implements OnInit {
     this.chatService.sendLie(this.currentAnswer);
   }
 
+  chooseLie(i: number) {
+    this.chatService.sendLieChoosen(this.answers[i]);
+  }
+
   private initBools(): void {
     this.answerNeeded = false;
     this.displayResults = false;
-  }
-
-  chooseLie(i: number) {
-    this.chatService.sendLieChoosen(this.answers[i]);
   }
 }
