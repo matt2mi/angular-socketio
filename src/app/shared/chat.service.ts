@@ -1,32 +1,38 @@
-import { Injectable } from '@angular/core';
-import { WebsocketService } from './websocket.service';
-import { Observable, Subject } from 'rxjs/Rx';
+import {Injectable} from '@angular/core';
+import {WebsocketService} from './websocket.service';
+import {UserService} from './user.service';
+import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class ChatService {
 
-    messages: Subject<any>;
-    pseudo:string;
+  messages: Subject<any>;
 
-    // Our constructor calls our wsService connect method
-    constructor(private wsService: WebsocketService) {
-    }
+  // Our constructor calls our wsService connect method
+  constructor(private wsService: WebsocketService,
+              private userService: UserService) {
+  }
 
-    connection(pseudo: string) {
-        console.log(pseudo);
-        return this.messages = <Subject<any>>this.wsService
-            .connect(pseudo)
-            .map((response: any): any => {
-                console.log(pseudo);
-                this.pseudo = pseudo;
-                return response;
-            });
-    }
+  connection(pseudo: string) {
+    return this.messages = <Subject<any>>this.wsService
+      .connect(pseudo)
+      .map((response: any): any => {
+        this.userService.pseudo = pseudo;
+        return response;
+      });
+  }
 
-    // Our simplified interface for sending
-    // messages back to our socket.io server
-    sendMsg(message: string) {
-        this.messages.next({pseudo: this.pseudo, message});
-    }
+  // Our simplified interface for sending
+  // messages back to our socket.io server
+  sendLie(answer: string) {
+    this.messages.next({pseudo: this.userService.pseudo, value: answer});
+  }
 
+  usersReady() {
+    this.wsService.usersReady();
+  }
+
+  sendLieChoosen(lie: any) {
+    this.wsService.sendLieChoosen(lie);
+  }
 }

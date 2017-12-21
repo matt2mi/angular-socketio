@@ -1,41 +1,80 @@
-import { Component, OnInit } from '@angular/core';
-import { ChatService } from './shared/chat.service';
+import {Component, OnInit} from '@angular/core';
+import {ChatService} from './shared/chat.service';
+import {UserService} from './shared/user.service';
 
-interface Message {type: string, text: string
+interface Message {
+  type: string;
+  value: {
+    pseudo: string,
+    message: string
+  };
+  nbUsers: number;
 }
-;
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-    title = 'app';
-    messages:Message[] = new Array<Message>();
-    currentAnswer:string;
-    pseudo:string;
+  messages: Message[] = [];
+  currentAnswer: string;
+  pseudo: string;
+  nbMaxUsers: number;
+  nbUsers: number;
+  userConnected = false;
+  answerNeeded = false;
+  displayResults = false;
+  answers = [];
+  questionAsked: string;
+  partyStarted = false;
 
-    constructor(private chat:ChatService) {
-    }
+  constructor(private chatService: ChatService) {
+  }
 
-    ngOnInit() {
-    }
+  ngOnInit() {
+    this.nbMaxUsers = 2;
+  }
 
-    signUp() {
-        this.chat
-            .connection(this.pseudo);
-        this.chat.messages.subscribe(msg => {
-                console.log(msg);
-                if (msg.type === 'new-user') {
-                    msg.value = {message: 'New user connected : ' + msg.pseudo, pseudo: ''};
-                }
-                this.messages.push(msg);
-            },
-                error => console.log(error));
-    }
+  signUp() {
+    this.chatService.connection(this.pseudo);
+    this.userConnected = true;
+    this.chatService.messages.subscribe(msg => {
+        console.log(msg);
+        this.initBools();
 
-    sendMessage() {
-        this.chat.sendMsg(this.currentAnswer);
-    }
+        if (!this.partyStarted) {
+          this.nbUsers = msg.nbUsers;
+          if (msg.nbUsers === this.nbMaxUsers) {
+            this.chatService.usersReady();
+            this.partyStarted = true;
+          }
+        } else {
+          if (msg.type === 'question') {
+            this.answerNeeded = true;
+            this.questionAsked = msg.value.question;
+            this.messages.push(msg);
+          }
+          if (msg.type === 'answers') {
+            this.displayResults = true;
+            this.answers = msg.value.answers;
+          }
+        }
+      },
+      error => console.log(error));
+  }
+
+  sendLie() {
+    this.answerNeeded = false;
+    this.chatService.sendLie(this.currentAnswer);
+  }
+
+  private initBools(): void {
+    this.answerNeeded = false;
+    this.displayResults = false;
+  }
+
+  chooseLie(i: number) {
+    this.chatService.sendLieChoosen(this.answers[i]);
+  }
 }

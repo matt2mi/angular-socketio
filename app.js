@@ -1,38 +1,37 @@
-let express = require('express');
-let app = express();
-let http = require('http').Server(app);
-let io = require('socket.io')(http);
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var logger = require('logger').createLogger();
 
-io.on('connection', (socket) => {
-    // Log whenever a client disconnects from our websocket server
-    socket.on('disconnect', () => console.log('user disconnected'));
-
-    // When we receive a 'message' event from our client, print out
-    // the contents of that message and then echo it back to our client
-    // using `io.emit()`
-    socket.on('message', (message) => {
-        console.log("Message Received from " + message.pseudo + " : " + message.message);
-        io.emit('message', {type: 'new-message', value: message});
-    });
-
-    socket.on('new-user', (pseudo) => {
-        console.log("New user connected : " + pseudo);
-        io.emit('new-user', {type: 'new-user', pseudo: pseudo});
-    });
-});
-
-
+app.set('port', process.env.PORT || '3000');
 
 // Create link to Angular build directory
-//app.use(express.static(__dirname + "/dist/"));
+app.use(express.static(__dirname + "/dist/"));
 
-// Initialize our websocket server on port 5000
-http.listen(5000, () => {
-    console.log('started on port 5000');
+app.use('/', require('./routes/routes'));
+
+//app.use(logger.info('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({'extended': 'false'}));
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
-// Generic error handler used by all endpoints.
-//function handleError(res, reason, message, code) {
-//    console.log("ERROR: " + reason);
-//    res.status(code || 500).json({"error": message});
-//}
+// error handler
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+// render the error page
+  res.status(err.status || 500);
+  res.send('error ' + err.status);
+});
+
+var server = app.listen(app.get('port'), function() {
+  console.log('Express server listening on port ' + server.address().port);
+});

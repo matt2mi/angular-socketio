@@ -1,9 +1,27 @@
-<input type="text" [(ngModel)]="pseudo" placeholder="choose pseudo">
-<button (click)="signUp()">log in</button>
-<hr>
-<input type="text" [(ngModel)]="currentAnswer" placeholder="type message">
-<button (click)="sendMessage()">Send</button>
+<div *ngIf="!userConnected">
+  <input type="text" [(ngModel)]="pseudo" placeholder="choose pseudo">
+  <button (click)="signUp()">log in</button>
+</div>
 
-<div style="border: 1px solid black;" *ngFor="let message of messages.reverse();">
-    {{message.value.pseudo}} : {{message.value.message}}
+<span *ngIf="userConnected">{{nbUsers}}/{{nbMaxUsers}} joueurs connectés</span>
+
+<hr>
+
+<div *ngIf="userConnected && answerNeeded">
+  <span style="border: 1px solid green">{{questionAsked}}</span>
+</div>
+
+<br>
+
+<div *ngIf="userConnected && answerNeeded">
+  <input type="text" [(ngModel)]="currentAnswer" placeholder="Lie to this !">
+  <button (click)="sendLie()">Send lie</button>
+</div>
+
+<br>
+
+<div *ngIf="userConnected && displayResults">
+  <span style="border: 1px solid orangered" *ngFor="let answer of answers; let i = index;">
+    <button (click)="chooseLie(i)">{{i + ' - Rep de ' + answer.pseudo + ': ' + answer.value}}</button>
+  </span>
 </div>

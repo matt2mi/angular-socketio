@@ -1,12 +1,11 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
-
-import { AppComponent } from './app.component';
-import { ChatService } from './shared/chat.service';
-import { WebsocketService } from './shared/websocket.service';
-
+import {AppComponent} from './app.component';
+import {ChatService} from './shared/chat.service';
+import {WebsocketService} from './shared/websocket.service';
+import {UserService} from './shared/user.service';
 
 @NgModule({
   declarations: [
@@ -14,9 +13,10 @@ import { WebsocketService } from './shared/websocket.service';
   ],
   imports: [
     BrowserModule,
-      FormsModule
+    FormsModule
   ],
-  providers: [ChatService, WebsocketService],
+  providers: [ChatService, WebsocketService, UserService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
