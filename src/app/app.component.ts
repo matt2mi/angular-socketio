@@ -17,24 +17,26 @@ interface Message {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  messages: Message[] = [];
   currentAnswer: string;
-  pseudo: string;
-  url: string;
-  nbMaxUsers: number;
+  pseudo = 'matt';
+  url = 'localhost';
+  nbMaxPlayers: number;
   nbUsers: number;
-  userConnected = false;
-  answerNeeded = false;
-  displayResults = false;
-  answers = [];
+  playersLies = [];
   questionAsked: string;
+
+  userConnected = false;
   partyStarted = false;
+  displayQuestion = false;
+  displayAnswerForm = false;
+  displayLies = false;
+  displayScores = false;
 
   constructor(private chatService: ChatService) {
   }
 
   ngOnInit() {
-    this.nbMaxUsers = 2;
+    this.nbMaxPlayers = 2;
   }
 
   signUp() {
@@ -42,23 +44,25 @@ export class AppComponent implements OnInit {
     this.userConnected = true;
     this.chatService.messages.subscribe(msg => {
         console.log(msg);
-        this.initBools();
 
         if (!this.partyStarted) {
           this.nbUsers = msg.nbUsers;
-          if (msg.nbUsers === this.nbMaxUsers) {
+          if (msg.nbUsers === this.nbMaxPlayers) {
             this.chatService.usersReady();
             this.partyStarted = true;
           }
         } else {
           if (msg.type === 'question') {
-            this.answerNeeded = true;
-            this.questionAsked = msg.value.question;
-            this.messages.push(msg);
+            this.displayQuestion = this.displayAnswerForm = true;
+            this.questionAsked = msg.question;
           }
-          if (msg.type === 'answers') {
-            this.displayResults = true;
-            this.answers = msg.value.answers;
+          if (msg.type === 'lies') {
+            this.playersLies = msg.playersLies;
+            this.displayLies = true;
+          }
+          if (msg.type === 'scores') {
+            this.calculateScores(msg);
+            this.displayScores = true;
           }
         }
       },
@@ -66,16 +70,30 @@ export class AppComponent implements OnInit {
   }
 
   sendLie() {
-    this.answerNeeded = false;
+    this.displayAnswerForm = false;
     this.chatService.sendLie(this.currentAnswer);
   }
 
-  chooseLie(i: number) {
-    this.chatService.sendLieChoosen(this.answers[i]);
+  chooseAnswer(i: number) {
+    this.displayQuestion = false;
+    this.displayLies = false;
+    this.chatService.sendAnswer(this.playersLies[i]);
   }
 
-  private initBools(): void {
-    this.answerNeeded = false;
-    this.displayResults = false;
+  private calculateScores({playersLies, playersAnswers}) {
+    // let scores: {pseudo: string, score: number}[] = [];
+    //
+    // playersAnswers.forEach(playerAnswer => {
+    //   const winner = this.whoIsThisLie()
+    // });
+
+    console.log(playersLies);
+    console.log(playersAnswers);
+  }
+
+  private whoIsThisLie(lieToFind: string, liesList: any[]): string {
+    const lieFound = liesList.find(lie => lie === lieToFind);
+    console.log(lieFound);
+    return lieFound;
   }
 }

@@ -32,7 +32,7 @@ export class ChatService {
     this.wsService.usersReady();
   }
 
-  sendLieChoosen(lie: any) {
-    this.wsService.sendLieChoosen(lie);
+  sendAnswer(answer: any) {
+    this.wsService.sendAnswer(answer);
   }
 }

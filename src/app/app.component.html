@@ -1,28 +1,55 @@
-<div *ngIf="!userConnected">
-  <input type="text" [(ngModel)]="pseudo" placeholder="choose pseudo">
-  <input type="text" [(ngModel)]="url" placeholder="choose url">
-  <button (click)="signUp()">log in</button>
-</div>
+<div class="container-fluid px-0">
 
-<span *ngIf="userConnected">{{nbUsers}}/{{nbMaxUsers}} joueurs connectés</span>
+  <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-<hr>
+    <a class="navbar-brand" href="#">Lie GAME</a>
 
-<div *ngIf="userConnected && answerNeeded">
-  <span style="border: 1px solid green">{{questionAsked}}</span>
-</div>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+      <form class="form-inline my-2 my-lg-0" *ngIf="!userConnected">
+        <input class="form-control" type="text" [(ngModel)]="pseudo" name="pseudo" placeholder="choose pseudo">
+        <input class="form-control" type="text" [(ngModel)]="url" name="url" placeholder="choose url">
+        <button class="btn btn-outline-success" (click)="signUp()">log in</button>
+      </form>
+      <div *ngIf="userConnected">{{nbUsers}}/{{nbMaxPlayers}} joueurs connectés</div>
+    </div>
+  </nav>
 
-<br>
+  <div class="container" *ngIf="userConnected">
 
-<div *ngIf="userConnected && answerNeeded">
-  <input type="text" [(ngModel)]="currentAnswer" placeholder="Lie to this !">
-  <button (click)="sendLie()">Send lie</button>
-</div>
+    <div class="row">
+      <div class="card col-lg-12 mt-3" *ngIf="displayQuestion">
+        <div class="card-block">
+          <div>{{questionAsked}}</div>
+        </div>
+      </div>
+    </div>
 
-<br>
+    <div class="row">
+      <div class="card col-lg-12 mt-3" *ngIf="displayAnswerForm">
+        <div class="card-block">
+          <input class="form-control mr-sm-2" type="text" [(ngModel)]="currentAnswer" placeholder="Lie to this !">
+          <button class="btn btn-success mt-2" (click)="sendLie()">Send lie</button>
+        </div>
+      </div>
+    </div>
 
-<div *ngIf="userConnected && displayResults">
-  <span style="border: 1px solid orangered" *ngFor="let answer of answers; let i = index;">
-    <button (click)="chooseLie(i)">{{i + ' - Rep de ' + answer.pseudo + ': ' + answer.value}}</button>
-  </span>
+    <div class="row">
+      <div class="card col-lg-12 mt-3" *ngIf="displayLies">
+        <div class="card-block">
+          <div class="col" *ngFor="let lie of playersLies; let i = index;">
+            <button class="btn btn-success" (click)="chooseAnswer(i)">{{i + ' - Rep de ' + lie.pseudo + ': ' +
+              lie.value}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </div>

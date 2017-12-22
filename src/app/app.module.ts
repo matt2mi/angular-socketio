@@ -20,3 +20,5 @@ import {UserService} from './shared/user.service';
 })
 export class AppModule {
 }
+
+// Routing : https://codecraft.tv/courses/angular/routing/routing-strategies/

@@ -25,7 +25,8 @@ export class WebsocketService {
       this.socket.on('new-user', data => serverDataObserver.next(data));
       this.socket.on('user-out', data => serverDataObserver.next(data));
       this.socket.on('question', data => serverDataObserver.next(data));
-      this.socket.on('answers', data => serverDataObserver.next(data));
+      this.socket.on('lies', data => serverDataObserver.next(data));
+      this.socket.on('scores', data => serverDataObserver.next(data));
       return () => this.socket.disconnect();
     });
 
@@ -33,7 +34,7 @@ export class WebsocketService {
     // from our other components and send messages back to our
     // socket server whenever the `next()` method is called.
     const newMessageObserver = {
-      next: (data: Object) => this.socket.emit('answer', data)
+      next: (data: Object) => this.socket.emit('lying', data)
     };
 
     this.socket.emit('new-user', JSON.stringify(pseudo));
@@ -47,7 +48,7 @@ export class WebsocketService {
     this.socket.emit('users-ready');
   }
 
-  sendLieChoosen(lie: any) {
-    this.socket.emit('lie-choosen', lie);
+  sendAnswer(answer: any) {
+    this.socket.emit('answer', answer);
   }
 }
