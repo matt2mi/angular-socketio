@@ -1,74 +1,20 @@
 <div class="container-fluid px-0">
 
-  <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
-    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-            aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
+  <nav class="navbar navbar-toggleable-md navbar-light bg-faded mb-3">
     <a class="navbar-brand" href="#">Lie GAME</a>
 
-    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-      <form class="form-inline my-2 my-lg-0" *ngIf="!userConnected">
-        <input class="form-control" type="text" [(ngModel)]="pseudo" name="pseudo" placeholder="choose pseudo">
-        <input class="form-control" type="text" [(ngModel)]="url" name="url" placeholder="choose url">
-        <button class="btn btn-outline-success" (click)="signUp()">log in</button>
-      </form>
-      <div *ngIf="userConnected">{{pseudo}}</div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" routerLink="/setting">Heroes</a>
+        </li>
+      </ul>
+      <div class="justify-content-end">
+        <div *ngIf="userConnected">{{pseudo}}</div>
+      </div>
     </div>
   </nav>
 
-  <div class="container" *ngIf="userConnected">
-
-    <div class="row">
-      <div class="card col-sm-3 mt-3" *ngFor="let player of playersss">
-        <div class="card-block">
-          <div>{{player.pseudo ? player.pseudo : '...'}}</div>
-        </div>
-      </div>
-      {{nbUsers}}/{{nbMaxPlayers}} joueurs connectés
-    </div>
-
-    <div class="row">
-      <div class="card col-lg-12 mt-3" *ngIf="displayQuestion">
-        <div class="card-block">
-          <div>{{questionAsked}}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="card col-lg-12 mt-3" *ngIf="displayAnswerForm">
-        <div class="card-block">
-          <input class="form-control mr-sm-2" type="text" [(ngModel)]="currentAnswer" placeholder="Lie to this !">
-          <button class="btn btn-success mt-2" (click)="sendLie()">Send lie</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="card col-lg-12 mt-3" *ngIf="displayLies">
-        <div class="card-block">
-          <div class="col" *ngFor="let lie of playersLies; let i = index;">
-            <button class="btn btn-success" (click)="chooseAnswer(i)">{{i + ' - Rep de ' + lie.pseudo + ': ' +
-              lie.value}}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="card col-lg-12 mt-3" *ngIf="displayScores">
-        <div class="card-block">
-          <div class="col" *ngFor="let score of scores;">
-            <div>{{score.pseudo}} : {{score.value}}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
+  <router-outlet></router-outlet>
 
 </div>

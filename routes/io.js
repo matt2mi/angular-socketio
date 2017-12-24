@@ -6,30 +6,47 @@ var io = require('socket.io')(server);
 
 var usersSockets = new Map();
 var firstQuestionSent = false;
-var nbMaxPlayers = 4;
+var nbMaxPlayers = 2;
 var playersLies = new Map();
 var playersAnswers = new Map();
+var players = [];
+
+var addPlayer = function(pseudo) {
+  players.push({pseudo: pseudo});
+  console.log(players);
+};
+var deletePlayer = function(pseudo) {
+  var id = -1;
+  players.forEach(function(player, i) {
+    if(player.pseudo === pseudo) id = i;
+  });
+  players.splice(id, 1);
+  console.log(players);
+};
 
 io.on('connection', function (socket) {
+
   // Log whenever a client disconnects from our websocket server
   socket.on('disconnect', function () {
     var pseudo = usersSockets.get(socket);
     usersSockets.delete(socket);
+    deletePlayer(pseudo);
+
     console.log('user disconnected: ' + pseudo);
     io.emit('user-out', {
       type: 'user-out',
-      value: {pseudo: '', message: 'Bye bye ' + pseudo},
-      nbUsers: usersSockets.size
+      players: players
     });
   });
 
   socket.on('new-user', function (pseudo) {
     usersSockets.set(socket, pseudo);
     console.log('New user connected : ' + pseudo);
+    addPlayer(pseudo);
+
     io.emit('new-user-detail', {
       type: 'new-user-detail',
-      playersName: Array.from(usersSockets.values()),
-      nbUsers: usersSockets.size,
+      players: players,
       nbMaxPlayers: nbMaxPlayers
     });
   });
@@ -38,7 +55,6 @@ io.on('connection', function (socket) {
   socket.on('users-ready', function () {
     if (!firstQuestionSent) {
       console.log('Users ready - send first question !');
-      nbMaxPlayers = usersSockets.size;
       io.emit('question', {
         type: 'question',
         question: 'Question de merde ?'
