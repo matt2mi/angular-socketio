@@ -8,7 +8,8 @@ app.set('port', process.env.PORT || '3000');
 // Create link to Angular build directory
 app.use(express.static(__dirname + "/dist/"));
 
-app.use('/', require('./routes/routes'));
+app.use('/', require('./routes/io'));
+
 
 //app.use(logger.info('dev'));
 app.use(bodyParser.json());

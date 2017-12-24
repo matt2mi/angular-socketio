@@ -32,7 +32,7 @@ export class ChatService {
     this.wsService.usersReady();
   }
 
-  sendAnswer(answer: any) {
-    this.wsService.sendAnswer(answer);
+  sendAnswer(pseudo: string, answer: any) {
+    this.wsService.sendAnswer(pseudo, answer);
   }
 }

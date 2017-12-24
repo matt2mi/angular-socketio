@@ -15,11 +15,20 @@
         <input class="form-control" type="text" [(ngModel)]="url" name="url" placeholder="choose url">
         <button class="btn btn-outline-success" (click)="signUp()">log in</button>
       </form>
-      <div *ngIf="userConnected">{{nbUsers}}/{{nbMaxPlayers}} joueurs connectés</div>
+      <div *ngIf="userConnected">{{pseudo}}</div>
     </div>
   </nav>
 
   <div class="container" *ngIf="userConnected">
+
+    <div class="row">
+      <div class="card col-sm-3 mt-3" *ngFor="let player of playersss">
+        <div class="card-block">
+          <div>{{player.pseudo ? player.pseudo : '...'}}</div>
+        </div>
+      </div>
+      {{nbUsers}}/{{nbMaxPlayers}} joueurs connectés
+    </div>
 
     <div class="row">
       <div class="card col-lg-12 mt-3" *ngIf="displayQuestion">
@@ -45,6 +54,16 @@
             <button class="btn btn-success" (click)="chooseAnswer(i)">{{i + ' - Rep de ' + lie.pseudo + ': ' +
               lie.value}}
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="card col-lg-12 mt-3" *ngIf="displayScores">
+        <div class="card-block">
+          <div class="col" *ngFor="let score of scores;">
+            <div>{{score.pseudo}} : {{score.value}}</div>
           </div>
         </div>
       </div>

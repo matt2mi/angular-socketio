@@ -22,7 +22,7 @@ export class WebsocketService {
     // from our socket.io server.
     const observable = new Observable(serverDataObserver => {
       this.socket.on('message', data => serverDataObserver.next(data));
-      this.socket.on('new-user', data => serverDataObserver.next(data));
+      this.socket.on('new-user-detail', data => serverDataObserver.next(data));
       this.socket.on('user-out', data => serverDataObserver.next(data));
       this.socket.on('question', data => serverDataObserver.next(data));
       this.socket.on('lies', data => serverDataObserver.next(data));
@@ -37,7 +37,7 @@ export class WebsocketService {
       next: (data: Object) => this.socket.emit('lying', data)
     };
 
-    this.socket.emit('new-user', JSON.stringify(pseudo));
+    this.socket.emit('new-user', pseudo);
 
     // we return our Rx.Subject which is a combination
     // of both an observer and observable.
@@ -48,7 +48,7 @@ export class WebsocketService {
     this.socket.emit('users-ready');
   }
 
-  sendAnswer(answer: any) {
-    this.socket.emit('answer', answer);
+  sendAnswer(pseudo: string, answer: any) {
+    this.socket.emit('answer', {pseudo, answer});
   }
 }

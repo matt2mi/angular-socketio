@@ -6,7 +6,7 @@ var io = require('socket.io')(server);
 
 var usersSockets = new Map();
 var firstQuestionSent = false;
-var nbMaxUsers = 0;
+var nbMaxPlayers = 4;
 var playersLies = new Map();
 var playersAnswers = new Map();
 
@@ -26,10 +26,11 @@ io.on('connection', function (socket) {
   socket.on('new-user', function (pseudo) {
     usersSockets.set(socket, pseudo);
     console.log('New user connected : ' + pseudo);
-    io.emit('new-user', {
-      type: 'new-user',
-      value: {pseudo: '', message: 'New user connected : ' + pseudo},
-      nbUsers: usersSockets.size
+    io.emit('new-user-detail', {
+      type: 'new-user-detail',
+      playersName: Array.from(usersSockets.values()),
+      nbUsers: usersSockets.size,
+      nbMaxPlayers: nbMaxPlayers
     });
   });
 
@@ -37,7 +38,7 @@ io.on('connection', function (socket) {
   socket.on('users-ready', function () {
     if (!firstQuestionSent) {
       console.log('Users ready - send first question !');
-      nbMaxUsers = usersSockets.size;
+      nbMaxPlayers = usersSockets.size;
       io.emit('question', {
         type: 'question',
         question: 'Question de merde ?'
@@ -50,7 +51,7 @@ io.on('connection', function (socket) {
   socket.on('lying', function (lie) {
     console.log('lying - ' + lie.pseudo + ' lies with : ' + lie.value);
     playersLies.set(socket, lie);
-    if (playersLies.size === nbMaxUsers) {
+    if (playersLies.size === nbMaxPlayers) {
       console.log(Array.from(playersLies.values()));
       io.emit('lies', {
         type: 'lies',
@@ -60,18 +61,18 @@ io.on('connection', function (socket) {
   });
 
   // each player has choosen a good answer <=> sending back lists of player/lie/answer
-  socket.on('answer', function (answer) {
-    console.log('answer - ' + answer.pseudo + ' chooses answer : ' + answer.value);
-    playersAnswers.set(socket, answer); // réponse de chaque joueur
+  socket.on('answer', function (playerAnswer) {
+    console.log('answer - ' + playerAnswer.pseudo + ' chooses answer : ' + playerAnswer.answer.value + ' from '
+      + playerAnswer.answer.pseudo);
 
-    if (playersAnswers.size === nbMaxUsers) {
+    // liste des réponses
+    playersAnswers.set(socket, playerAnswer);
+
+    if (playersAnswers.size === nbMaxPlayers) {
       console.log('playersLies: ', Array.from(playersLies.values()));
       console.log('playersAnswers: ', Array.from(playersAnswers.values()));
       io.emit('scores', {
         type: 'scores',
-        // liste des mensonges
-        playersLies: Array.from(playersLies.values()),
-        // liste des réponses
         playersAnswers: Array.from(playersAnswers.values())
       });
     }
