@@ -6,6 +6,8 @@ var io = require('socket.io')(server);
 
 var usersSockets = new Map();
 var startPartySockets = new Map();
+var questionsAsked = [];
+var currentQuestionId = -1;
 var firstQuestionSent = false;
 var secondQuestionSent = false;
 var nbMaxPlayers = 4;
@@ -18,11 +20,17 @@ var questions = require('../bdd/questions');
 
 function getNewId() {
   const id = Math.floor(Math.random() * questions.length);
+  if (questionsAsked.indexOf(id) === -1 && questionsAsked.length > 0) {
+    return getNewId();
+  }
+  questionsAsked.push(id);
   return id;
 }
 
 function getQuestion() {
-  return questions[getNewId()];
+  const newId = getNewId();
+  currentQuestionId = newId;
+  return questions[newId];
 }
 
 function addPlayer(pseudo) {
@@ -54,12 +62,12 @@ function getPlayersLies() {
 
 function getPcLies() {
   return [
-    {pseudo: 'pc', value: questions[0].lies[0]}
+    {pseudo: 'pc', value: questions[currentQuestionId].lies[0]}
   ];
 }
 
 function getGoodAnswer() {
-  return {pseudo: 'truth', value: questions[0].answers[0]};
+  return {pseudo: 'truth', value: questions[currentQuestionId].answers[0]};
 }
 
 function allWantStart() {
@@ -71,6 +79,8 @@ function allWantStart() {
 }
 
 function initState() {
+  currentQuestionId = -1;
+  questionsAsked = [];
   firstQuestionSent = false;
   secondQuestionSent = false;
   playersLies = new Map();

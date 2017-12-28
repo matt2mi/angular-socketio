@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {WebsocketService} from './websocket.service';
 import {Subject} from 'rxjs/Subject';
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class ChatService {
