@@ -52,10 +52,11 @@ export class CurrentPartyComponent implements OnInit {
             this.nbMaxPlayers = msg.nbMaxPlayers;
           }
 
-          if (msg.type === 'all-wants-start' || this.players.length === this.nbMaxPlayers) {
+          if (msg.type === 'all-want-start' || this.players.length === this.nbMaxPlayers) {
             this.nbMaxPlayers = msg.players.length; // if all wants start case
             this.chatService.usersReady();
             this.partyStarted = true;
+            this.displayScores = false;
           }
         } else {
           if (msg.type === 'question') {
@@ -73,6 +74,7 @@ export class CurrentPartyComponent implements OnInit {
             this.results = this.calculateResults(msg);
             this.scores = this.calculateScores();
             this.displayScores = true;
+            this.partyStarted = false;
           }
         }
       },

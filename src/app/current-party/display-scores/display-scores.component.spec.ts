@@ -1,6 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {DisplayScoresComponent} from './display-scores.component';
+import {WebsocketService} from '../../shared/websocket.service';
 
 describe('DisplayScoresComponent', () => {
   let component: DisplayScoresComponent;
@@ -8,7 +9,8 @@ describe('DisplayScoresComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [DisplayScoresComponent]
+      declarations: [DisplayScoresComponent],
+      providers: [WebsocketService]
     })
       .compileComponents();
   }));

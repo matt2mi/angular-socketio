@@ -5,7 +5,7 @@
   </form>
 </div>
 
-<div class="container" *ngIf="userConnected && !partyStarted">
+<div class="container" *ngIf="userConnected && !partyStarted && !displayScores">
   <div class="row">
     <div class="card col-sm-3" *ngFor="let player of players">
       <div class="card-block">

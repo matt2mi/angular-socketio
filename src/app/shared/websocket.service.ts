@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import * as io from 'socket.io-client';
 import {Observable} from 'rxjs/Observable';
-import * as Rx from 'rxjs/Rx';
-import {environment} from '../../environments/environment';
+import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class WebsocketService {
@@ -13,7 +12,7 @@ export class WebsocketService {
   constructor() {
   }
 
-  connect(pseudo: string, url: string): Rx.Subject<MessageEvent> {
+  connect(pseudo: string, url: string): Subject<MessageEvent> {
     // If you aren't familiar with environment variables then
     // you can hard code `environment.ws_url` as `http://localhost:5000`
     this.socket = io(url + ':5000');
@@ -24,7 +23,7 @@ export class WebsocketService {
       this.socket.on('message', data => serverDataObserver.next(data));
       this.socket.on('new-user-detail', data => serverDataObserver.next(data));
       this.socket.on('user-out', data => serverDataObserver.next(data));
-      this.socket.on('all-wants-start', data => serverDataObserver.next(data));
+      this.socket.on('all-want-start', data => serverDataObserver.next(data));
       this.socket.on('question', data => serverDataObserver.next(data));
       this.socket.on('lies', data => serverDataObserver.next(data));
       this.socket.on('scores', data => serverDataObserver.next(data));
@@ -42,22 +41,30 @@ export class WebsocketService {
 
     // we return our Rx.Subject which is a combination
     // of both an observer and observable.
-    return Rx.Subject.create(newMessageObserver, observable);
+    return Subject.create(newMessageObserver, observable);
   }
 
-  usersReady() {
+  usersReady(): void {
     this.socket.emit('users-ready');
   }
 
-  sendAnswer(pseudo: string, answer: any) {
+  sendAnswer(pseudo: string, answer: any): void {
     this.socket.emit('answer', {pseudo, answer});
   }
 
-  startParty(pseudo: string) {
+  startParty(pseudo: string): void {
     this.socket.emit('start-party', pseudo);
   }
 
-  unStartParty() {
+  unStartParty(): void {
     this.socket.emit('stop-start-party');
+  }
+
+  restart(pseudo: string): void {
+    this.socket.emit('restart', pseudo);
+  }
+
+  unRestart(pseudo: string) {
+    this.socket.emit('unrestart', pseudo);
   }
 }

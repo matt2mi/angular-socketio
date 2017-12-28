@@ -14,7 +14,7 @@
 
           <div class="col-sm-3">
             <div [ngStyle]="{'border': result.answer.truth ? '1px solid green' : '1px solid red'}">
-              {{result.answer.value + result.answer.pseudo === 'truth' ?
+              {{result.answer.value}}{{result.answer.pseudo === 'truth' ?
               ' (bonne réponse)' :
               ' (mensonge de ' + result.answer.pseudo + ')'}}
             </div>
@@ -46,5 +46,10 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="row mt-3">
+    <button *ngIf="!restartState" class="btn btn-success" (click)="restart()">Recommencer</button>
+    <button *ngIf="restartState" class="btn btn-warning" (click)="unRestart()">Ne pas recommencer</button>
   </div>
 </div>

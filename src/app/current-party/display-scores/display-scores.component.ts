@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {WebsocketService} from '../../shared/websocket.service';
 
 @Component({
   selector: 'app-display-scores',
@@ -7,22 +8,29 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class DisplayScoresComponent implements OnInit {
 
-  @Input()
-  questionAsked: string;
-  @Input()
-  results = [];
-  @Input()
-  scores = [];
-  @Input()
-  pseudo: string;
+  @Input() questionAsked: string;
+  @Input() results = [];
+  @Input() scores = [];
+  @Input() pseudo: string;
 
   isWinning = false;
+  restartState = false;
 
-  constructor() {
+  constructor(private webSocketService: WebsocketService) {
   }
 
   ngOnInit() {
     this.setIsWinning();
+  }
+
+  restart(): void {
+    this.webSocketService.restart(this.pseudo);
+    this.restartState = true;
+  }
+
+  unRestart(): void {
+    this.webSocketService.unRestart(this.pseudo);
+    this.restartState = false;
   }
 
   private setIsWinning() {

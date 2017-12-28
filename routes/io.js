@@ -7,22 +7,23 @@ var io = require('socket.io')(server);
 var usersSockets = new Map();
 var startPartySockets = new Map();
 var firstQuestionSent = false;
+var secondQuestionSent = false;
 var nbMaxPlayers = 4;
 var playersLies = new Map();
 var playersAnswers = new Map();
+var restartSocket = new Map();
 var players = [];
 
-var questions = [
-  {
-    text: 'El colacho est un festival espagnol où les gens s\'habille en diables et sautent au dessus de...',
-    answers: ['bébé', 'bebe', 'bébés', 'bebes'],
-    lies: ['voitures', 'piscines']
-  }, {
-    text: 'Dans la ville d\'Alliance au Nebraska, on peut voir une réplique du Stonehenge faite de...',
-    answers: ['voiture', 'voitures'],
-    lies: ['crottes', 'patates']
-  }
-];
+var questions = require('../bdd/questions');
+
+function getNewId() {
+  const id = Math.floor(Math.random() * questions.length);
+  return id;
+}
+
+function getQuestion() {
+  return questions[getNewId()];
+}
 
 function addPlayer(pseudo) {
   players.push({pseudo: pseudo});
@@ -37,10 +38,12 @@ function deletePlayer(pseudo) {
 }
 
 function sendQuestion() {
+  console.log('sendQuestion');
+  const question = getQuestion();
   io.emit('question', {
     type: 'question',
-    question: questions[0].text,
-    answers: questions[0].answers
+    question: question.text,
+    answers: question.answers
   });
   firstQuestionSent = true;
 }
@@ -57,6 +60,22 @@ function getPcLies() {
 
 function getGoodAnswer() {
   return {pseudo: 'truth', value: questions[0].answers[0]};
+}
+
+function allWantStart() {
+  initState();
+  io.emit('all-want-start', {
+    type: 'all-want-start',
+    players: players
+  });
+}
+
+function initState() {
+  firstQuestionSent = false;
+  secondQuestionSent = false;
+  playersLies = new Map();
+  playersAnswers = new Map();
+  restartSocket = new Map();
 }
 
 io.on('connection', function (socket) {
@@ -86,20 +105,17 @@ io.on('connection', function (socket) {
   socket.on('start-party', function (pseudo) {
     startPartySockets.set(socket, pseudo);
     if (startPartySockets.size === usersSockets.size) {
-      io.emit('all-wants-start', {
-        type: 'all-wants-start',
-        players: players
-      });
+      allWantStart();
     }
   });
-  socket.on('stop-start-party', function (pseudo) {
+  socket.on('stop-start-party', function () {
     startPartySockets.delete(socket);
   });
 
   // enough player to start party
   socket.on('users-ready', function () {
     if (!firstQuestionSent) {
-      sendQuestion(io);
+      sendQuestion();
     }
   });
 
@@ -128,6 +144,19 @@ io.on('connection', function (socket) {
         goodAnswer: getGoodAnswer()
       });
     }
+  });
+
+  socket.on('restart', function (pseudo) {
+    console.log(pseudo + ' veut recommencer');
+    restartSocket.set(socket, pseudo);
+    if (restartSocket.size === players.length) {
+      console.log('all restart');
+      allWantStart();
+    }
+  });
+  socket.on('unrestart', function (pseudo) {
+    console.log(pseudo + ' ne veut plus recommencer');
+    restartSocket.delete(socket);
   });
 });
 
