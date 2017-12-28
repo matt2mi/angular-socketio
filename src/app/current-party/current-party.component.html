@@ -1,0 +1,63 @@
+<div class="container" *ngIf="!userConnected">
+  <form class="form-inline my-2 my-lg-0" *ngIf="!userConnected">
+    <input class="form-control" type="text" [(ngModel)]="pseudo" name="pseudo" placeholder="choose pseudo">
+    <button class="btn btn-outline-success" (click)="signUp()">log in</button>
+  </form>
+</div>
+
+<div class="container" *ngIf="userConnected && !partyStarted">
+  <div class="row">
+    <div class="card col-sm-3" *ngFor="let player of players">
+      <div class="card-block">
+        <div>{{player.pseudo ? player.pseudo : '...'}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    {{players.length}}/{{nbMaxPlayers}} joueurs connectés
+  </div>
+
+  <div class="row mt-3">
+    <button *ngIf="readyState" class="btn btn-success" (click)="startParty()">Ready !</button>
+    <button *ngIf="!readyState" class="btn btn-warning" (click)="unStartParty()">Not ready</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row mt-3">
+    <div class="card col-lg-12" *ngIf="displayQuestion">
+      <div class="card-block">
+        <div>{{questionAsked}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card col-lg-12" *ngIf="displayAnswerForm">
+      <div class="card-block">
+        <input class="form-control mr-sm-2" type="text" [(ngModel)]="currentAnswer"
+               (ngModelChange)="displayGoodAnswerMessage = false;" placeholder="Lie to this !">
+        <div *ngIf="displayGoodAnswerMessage">Tu as trouvé la bonne réponse, réécris un vrai mensonge ;)</div>
+        <button class="btn btn-success mt-2" (click)="sendLie()">Send lie</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card col-lg-12" *ngIf="displayLies">
+      <div class="card-block">
+        <div class="col" *ngFor="let lie of lies; let i = index;">
+          <button [hidden]="lie.pseudo === pseudo" class="btn btn-success" (click)="chooseAnswer(i)">
+            {{lie.value}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" *ngIf="displayScores">
+  <app-display-scores [results]="results" [scores]="scores" [pseudo]="pseudo"
+                      [questionAsked]="questionAsked"></app-display-scores>
+</div>

@@ -5,20 +5,24 @@ import {FormsModule} from '@angular/forms';
 import {AppComponent} from './app.component';
 import {ChatService} from './shared/chat.service';
 import {WebsocketService} from './shared/websocket.service';
-import {UserService} from './shared/user.service';
 import {AppRoutingModule} from './app-routing.module';
-import {SettingComponent} from './setting/setting.component';
+import {CurrentPartyComponent} from './current-party/current-party.component';
 import {RouterModule, Routes} from '@angular/router';
+import {DataService} from './data.service';
+import {HeaderComponent} from './header/header.component';
+import { DisplayScoresComponent } from './current-party/display-scores/display-scores.component';
 
 const routes: Routes = [
-  {path: 'setting', component: SettingComponent},
-  {path: '', redirectTo: '/setting', pathMatch: 'full'}
+  {path: 'current', component: CurrentPartyComponent},
+  {path: '', redirectTo: '/current', pathMatch: 'full'}
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
-    SettingComponent
+    CurrentPartyComponent,
+    HeaderComponent,
+    DisplayScoresComponent
   ],
   imports: [
     BrowserModule,
@@ -29,11 +33,9 @@ const routes: Routes = [
   providers: [
     ChatService,
     WebsocketService,
-    UserService
+    DataService
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
 }
-
-// Routing : https://codecraft.tv/courses/angular/routing/routing-strategies/

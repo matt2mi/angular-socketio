@@ -24,6 +24,7 @@ export class WebsocketService {
       this.socket.on('message', data => serverDataObserver.next(data));
       this.socket.on('new-user-detail', data => serverDataObserver.next(data));
       this.socket.on('user-out', data => serverDataObserver.next(data));
+      this.socket.on('all-wants-start', data => serverDataObserver.next(data));
       this.socket.on('question', data => serverDataObserver.next(data));
       this.socket.on('lies', data => serverDataObserver.next(data));
       this.socket.on('scores', data => serverDataObserver.next(data));
@@ -50,5 +51,13 @@ export class WebsocketService {
 
   sendAnswer(pseudo: string, answer: any) {
     this.socket.emit('answer', {pseudo, answer});
+  }
+
+  startParty(pseudo: string) {
+    this.socket.emit('start-party', pseudo);
+  }
+
+  unStartParty() {
+    this.socket.emit('stop-start-party');
   }
 }

@@ -1,20 +1,8 @@
 <div class="container-fluid px-0">
+  <app-header></app-header>
 
-  <nav class="navbar navbar-toggleable-md navbar-light bg-faded mb-3">
-    <a class="navbar-brand" href="#">Lie GAME</a>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" routerLink="/setting">Heroes</a>
-        </li>
-      </ul>
-      <div class="justify-content-end">
-        <div *ngIf="userConnected">{{pseudo}}</div>
-      </div>
-    </div>
-  </nav>
-
-  <router-outlet></router-outlet>
+  <div class="container mt-3">
+    <router-outlet></router-outlet>
+  </div>
 
 </div>

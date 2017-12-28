@@ -5,24 +5,59 @@ var server = require('http').createServer(app); // Server(app)
 var io = require('socket.io')(server);
 
 var usersSockets = new Map();
+var startPartySockets = new Map();
 var firstQuestionSent = false;
-var nbMaxPlayers = 2;
+var nbMaxPlayers = 4;
 var playersLies = new Map();
 var playersAnswers = new Map();
 var players = [];
 
-var addPlayer = function(pseudo) {
+var questions = [
+  {
+    text: 'El colacho est un festival espagnol où les gens s\'habille en diables et sautent au dessus de...',
+    answers: ['bébé', 'bebe', 'bébés', 'bebes'],
+    lies: ['voitures', 'piscines']
+  }, {
+    text: 'Dans la ville d\'Alliance au Nebraska, on peut voir une réplique du Stonehenge faite de...',
+    answers: ['voiture', 'voitures'],
+    lies: ['crottes', 'patates']
+  }
+];
+
+function addPlayer(pseudo) {
   players.push({pseudo: pseudo});
-  console.log(players);
-};
-var deletePlayer = function(pseudo) {
+}
+
+function deletePlayer(pseudo) {
   var id = -1;
-  players.forEach(function(player, i) {
-    if(player.pseudo === pseudo) id = i;
+  players.forEach(function (player, i) {
+    if (player.pseudo === pseudo) id = i;
   });
   players.splice(id, 1);
-  console.log(players);
-};
+}
+
+function sendQuestion() {
+  io.emit('question', {
+    type: 'question',
+    question: questions[0].text,
+    answers: questions[0].answers
+  });
+  firstQuestionSent = true;
+}
+
+function getPlayersLies() {
+  return Array.from(playersLies.values());
+}
+
+function getPcLies() {
+  return [
+    {pseudo: 'pc', value: questions[0].lies[0]}
+  ];
+}
+
+function getGoodAnswer() {
+  return {pseudo: 'truth', value: questions[0].answers[0]};
+}
 
 io.on('connection', function (socket) {
 
@@ -31,8 +66,6 @@ io.on('connection', function (socket) {
     var pseudo = usersSockets.get(socket);
     usersSockets.delete(socket);
     deletePlayer(pseudo);
-
-    console.log('user disconnected: ' + pseudo);
     io.emit('user-out', {
       type: 'user-out',
       players: players
@@ -41,7 +74,6 @@ io.on('connection', function (socket) {
 
   socket.on('new-user', function (pseudo) {
     usersSockets.set(socket, pseudo);
-    console.log('New user connected : ' + pseudo);
     addPlayer(pseudo);
 
     io.emit('new-user-detail', {
@@ -51,45 +83,49 @@ io.on('connection', function (socket) {
     });
   });
 
+  socket.on('start-party', function (pseudo) {
+    startPartySockets.set(socket, pseudo);
+    if (startPartySockets.size === usersSockets.size) {
+      io.emit('all-wants-start', {
+        type: 'all-wants-start',
+        players: players
+      });
+    }
+  });
+  socket.on('stop-start-party', function (pseudo) {
+    startPartySockets.delete(socket);
+  });
+
   // enough player to start party
   socket.on('users-ready', function () {
     if (!firstQuestionSent) {
-      console.log('Users ready - send first question !');
-      io.emit('question', {
-        type: 'question',
-        question: 'Question de merde ?'
-      });
-      firstQuestionSent = true;
+      sendQuestion(io);
     }
   });
 
   // each player send his written lie <=> sending back all lies
   socket.on('lying', function (lie) {
-    console.log('lying - ' + lie.pseudo + ' lies with : ' + lie.value);
     playersLies.set(socket, lie);
-    if (playersLies.size === nbMaxPlayers) {
-      console.log(Array.from(playersLies.values()));
+    if (playersLies.size === players.length) {
       io.emit('lies', {
         type: 'lies',
-        playersLies: Array.from(playersLies.values())
+        playersLies: getPlayersLies(),
+        pcLies: getPcLies(),
+        goodAnswers: getGoodAnswer()
       });
     }
   });
 
   // each player has choosen a good answer <=> sending back lists of player/lie/answer
   socket.on('answer', function (playerAnswer) {
-    console.log('answer - ' + playerAnswer.pseudo + ' chooses answer : ' + playerAnswer.answer.value + ' from '
-      + playerAnswer.answer.pseudo);
-
     // liste des réponses
     playersAnswers.set(socket, playerAnswer);
 
-    if (playersAnswers.size === nbMaxPlayers) {
-      console.log('playersLies: ', Array.from(playersLies.values()));
-      console.log('playersAnswers: ', Array.from(playersAnswers.values()));
+    if (playersAnswers.size === players.length) {
       io.emit('scores', {
         type: 'scores',
-        playersAnswers: Array.from(playersAnswers.values())
+        playersAnswers: Array.from(playersAnswers.values()),
+        goodAnswer: getGoodAnswer()
       });
     }
   });

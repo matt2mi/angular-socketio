@@ -1,23 +1,22 @@
 import {Injectable} from '@angular/core';
 import {WebsocketService} from './websocket.service';
-import {UserService} from './user.service';
 import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class ChatService {
 
   messages: Subject<any>;
+  pseudo: string;
 
   // Our constructor calls our wsService connect method
-  constructor(private wsService: WebsocketService,
-              private userService: UserService) {
+  constructor(private wsService: WebsocketService) {
   }
 
   connection(pseudo: string, url: string) {
     return this.messages = <Subject<any>>this.wsService
       .connect(pseudo, url)
       .map((response: any): any => {
-        this.userService.pseudo = pseudo;
+        this.pseudo = pseudo;
         return response;
       });
   }
@@ -25,7 +24,7 @@ export class ChatService {
   // Our simplified interface for sending
   // messages back to our socket.io server
   sendLie(answer: string) {
-    this.messages.next({pseudo: this.userService.pseudo, value: answer});
+    this.messages.next({pseudo: this.pseudo, value: answer});
   }
 
   usersReady() {
@@ -34,5 +33,13 @@ export class ChatService {
 
   sendAnswer(pseudo: string, answer: any) {
     this.wsService.sendAnswer(pseudo, answer);
+  }
+
+  startParty(pseudo: string) {
+    this.wsService.startParty(pseudo);
+  }
+
+  unStartParty() {
+    this.wsService.unStartParty();
   }
 }

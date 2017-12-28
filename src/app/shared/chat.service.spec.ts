@@ -1,11 +1,12 @@
-import { TestBed, inject } from '@angular/core/testing';
+import {TestBed, inject} from '@angular/core/testing';
 
-import { ChatService } from './chat.service';
+import {ChatService} from './chat.service';
+import {WebsocketService} from './websocket.service';
 
 describe('ChatService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ChatService]
+      providers: [ChatService, WebsocketService]
     });
   });
 
