@@ -17,21 +17,11 @@ describe('CurrentPartyComponent', () => {
       declarations: [CurrentPartyComponent],
       providers: [
         {
-          provide: ChatService,
-          useClass: class {
-            messages = {};
-            connection = jasmine.createSpy('connection');
-            usersReady = jasmine.createSpy('usersReady');
-            startParty = jasmine.createSpy('startParty');
-            unStartParty = jasmine.createSpy('unStartParty');
-            sendLie = jasmine.createSpy('sendLie');
-            sendAnswer = jasmine.createSpy('sendAnswer');
+          provide: ChatService, useClass: class {
           }
         },
         {
-          provide: DataService,
-          useClass: class {
-            setPseudo = jasmine.createSpy('setPseudo');
+          provide: DataService, useClass: class {
           }
         }
       ]
@@ -124,7 +114,7 @@ describe('CurrentPartyComponent', () => {
     expect(result.length).toEqual(2);
   });
 
-  it('should create scores tab - 3 players - 1 good, 1 lie, 1 nul', () => {
+  it('should calculate scores - 3 players - 1 good, 1 lie, 1 nul', () => {
     component.players = [
       {pseudo: 'timo'},
       {pseudo: 'mimi'},
@@ -149,6 +139,62 @@ describe('CurrentPartyComponent', () => {
 
     expect(scores).toContain({pseudo: 'timo', value: 700});
     expect(scores).toContain({pseudo: 'matt', value: 200});
+    expect(scores).toContain({pseudo: 'mimi', value: 0});
+  });
+
+  it('should calculate scores - 3pl - 1 good, 2 pc lies', () => {
+    component.players = [
+      {pseudo: 'timo'},
+      {pseudo: 'mimi'},
+      {pseudo: 'matt'}
+    ];
+    component.results = [
+      {
+        answer: {truth: true, pseudo: 'truth', value: 'bébés'},
+        players: ['timo']
+      },
+      {
+        answer: {truth: false, pseudo: 'pc', value: 'pc'},
+        players: ['mimi']
+      },
+      {
+        answer: {truth: false, pseudo: 'pc', value: 'pc'},
+        players: ['matt']
+      }
+    ];
+
+    const scores = component.calculateScores();
+
+    expect(scores).toContain({pseudo: 'timo', value: 500});
+    expect(scores).toContain({pseudo: 'matt', value: -200});
+    expect(scores).toContain({pseudo: 'mimi', value: -200});
+  });
+
+  it('should calculate scores - 3pl - 1 good, 1 lie, 1 pc lies', () => {
+    component.players = [
+      {pseudo: 'timo'},
+      {pseudo: 'mimi'},
+      {pseudo: 'matt'}
+    ];
+    component.results = [
+      {
+        answer: {truth: true, pseudo: 'truth', value: 'truth'},
+        players: ['timo']
+      },
+      {
+        answer: {truth: false, pseudo: 'pc', value: 'pc'},
+        players: ['mimi']
+      },
+      {
+        answer: {truth: false, pseudo: 'mimi', value: 'mimi'},
+        players: ['matt']
+      }
+    ];
+
+    const scores = component.calculateScores();
+
+    expect(scores).toContain({pseudo: 'timo', value: 500});
+    expect(scores).toContain({pseudo: 'matt', value: 0});
     expect(scores).toContain({pseudo: 'mimi', value: 0});
   });
 });
